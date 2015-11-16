@@ -14,31 +14,4 @@
 	<natures>
 		<nature>org.eclipse.jdt.core.javanature</nature>
 	</natures>
-	<linkedResources>
-		<link>
-			<name>src/CourseraParser.java</name>
-			<type>1</type>
-			<locationURI>PARENT-3-PROJECT_LOC/AppData/Local/Temp/Rar$DRa0.800/JSoupCoursera/src/CourseraParser.java</locationURI>
-		</link>
-		<link>
-			<name>src/IDBEntry.java</name>
-			<type>1</type>
-			<locationURI>PARENT-3-PROJECT_LOC/AppData/Local/Temp/Rar$DRa0.800/JSoupCoursera/src/IDBEntry.java</locationURI>
-		</link>
-		<link>
-			<name>src/IMOOCSParser.java</name>
-			<type>1</type>
-			<locationURI>PARENT-3-PROJECT_LOC/AppData/Local/Temp/Rar$DRa0.800/JSoupCoursera/src/IMOOCSParser.java</locationURI>
-		</link>
-		<link>
-			<name>src/ParseCoursera.java</name>
-			<type>1</type>
-			<locationURI>PARENT-3-PROJECT_LOC/AppData/Local/Temp/Rar$DRa0.800/JSoupCoursera/src/ParseCoursera.java</locationURI>
-		</link>
-		<link>
-			<name>src/TsengDBEntry.java</name>
-			<type>1</type>
-			<locationURI>PARENT-3-PROJECT_LOC/AppData/Local/Temp/Rar$DRa0.800/JSoupCoursera/src/TsengDBEntry.java</locationURI>
-		</link>
-	</linkedResources>
 </projectDescription>
