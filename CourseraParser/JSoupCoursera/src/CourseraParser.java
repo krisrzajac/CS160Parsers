@@ -1,6 +1,7 @@
 import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -46,7 +47,7 @@ public class CourseraParser implements IMOOCSParser {
 			Pattern pattern = Pattern.compile("\"shortDescription\":\"(.*?)\"");
 			Matcher matcher = pattern.matcher(s);
 			matcher.find();
-			return matcher.group(1);
+			return matcher.group(1).replaceAll("'","''");
 		} else
 			return "";
 	}
@@ -61,7 +62,7 @@ public class CourseraParser implements IMOOCSParser {
 
 				// Since this is picking up HTML "Snippet" we need to clean up
 				// the string of any tags / attributes
-				return html2text(matcher.group(1)).trim().replaceAll("/\\\n", "");
+				return html2text(matcher.group(1)).trim().replaceAll("/\\\n", "").replaceAll("'","''");
 				// return matcher.group(1).replaceAll("<span>",
 				// "").replaceAll("<p>", "").replaceAll("</p>",
 				// "").replaceAll("</b>", "")
@@ -99,16 +100,20 @@ public class CourseraParser implements IMOOCSParser {
 
 	@Override
 	public Date ParseStartDate(String s) {
-		if (s.contains("\"startDate\"")) {
+		if (s.contains("\"startDay\"")) {
 			Pattern pattern = Pattern
-					.compile("\"startDay\":\"(.*?)\",.*\"startMonth\":\"(.*?)\",.*\"startYear\":\"(.*?)\"");
+					.compile("\"startDay\":(.*?),.*\"startMonth\":(.*?),.*\"startYear\":(.*?),");
+			
+			
 			Matcher matcher = pattern.matcher(s);
 			matcher.find();
-			Date date = new Date(11);
-			date.setDate(Integer.parseInt(matcher.group(1)));
-			date.setMonth(Integer.parseInt(matcher.group(2)) - 1);
-			date.setYear(Integer.parseInt(matcher.group(3)));
-			return date;
+			java.util.Date date = new Date(11);
+			Calendar startCal = Calendar.getInstance();
+			
+			startCal.set(Integer.parseInt(matcher.group(3)),Integer.parseInt(matcher.group(2)) - 1,Integer.parseInt(matcher.group(1)));
+			date = startCal.getTime();
+			java.sql.Date sqlDate = new java.sql.Date(date.getYear(), date.getMonth(), date.getDay());
+			return sqlDate;
 		} else
 			return null;
 	}
@@ -116,15 +121,16 @@ public class CourseraParser implements IMOOCSParser {
 	@Override
 	public int ParseCourseLength(String s) {
 		if (s.contains("\"durationString\"")) {
-			Pattern pattern = Pattern.compile("\"durationString\":\"(.*?)weeks\"");
+			Pattern pattern = Pattern.compile("\"durationString\":\"([0-9]*?) weeks\"");
 			Matcher matcher = pattern.matcher(s);
-			matcher.find();
-			return Integer.parseInt(matcher.group(1));
+			if(matcher.find())
+				return 4*Integer.parseInt(matcher.group(1));
+			else
+				return -1;
 		} else
 			return -1;
 
 	}
-
 	@Override
 	public String ParseCourseImageURL(String s) {
 		if (s.contains("\"photo\"")) {
@@ -258,7 +264,7 @@ public class CourseraParser implements IMOOCSParser {
 
 	public int ParseCourseID(String s) {
 		if (s.contains("\"courseId\"")) {
-			Pattern pattern = Pattern.compile("\"courseId\":\"(.*?)\"");
+			Pattern pattern = Pattern.compile("\"courseId\":(.*?),\"");
 			Matcher matcher = pattern.matcher(s);
 			matcher.find();
 			return Integer.parseInt(matcher.group(1));

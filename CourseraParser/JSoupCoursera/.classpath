@@ -7,5 +7,9 @@
 	<classpathentry kind="lib" path="C:/Users/Downstairs Better/Documents/Jlib/JSoup/jsoup-1.8.3-javadoc.jar"/>
 	<classpathentry kind="lib" path="C:/Users/Downstairs Better/Documents/Jlib/JSoup/jsoup-1.8.3-sources.jar"/>
 	<classpathentry kind="lib" path="C:/Users/Downstairs Better/Documents/Jlib/JSON in Java/json-20150729.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Kris/Documents/Java Libraries/JSoup/jsoup-1.8.3-javadoc.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Kris/Documents/Java Libraries/JSoup/jsoup-1.8.3.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Kris/Documents/Java Libraries/JSoup/jsoup-1.8.3-sources.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Kris/Documents/Java Libraries/MySQL Connector/mysql-connector-java-3.1.14-bin.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
