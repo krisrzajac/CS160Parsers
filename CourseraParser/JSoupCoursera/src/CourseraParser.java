@@ -25,7 +25,10 @@ public class CourseraParser implements IMOOCSParser {
 
 	@Override
 	public String GetURL(String url) throws IOException {
-		String temp = Jsoup.connect(url).timeout(0).ignoreContentType(true).execute().body();
+		
+		
+		
+		String temp = Jsoup.connect(url).maxBodySize(10000000).timeout(0).ignoreContentType(true).execute().body();
 		return temp;
 	}
 
@@ -36,7 +39,7 @@ public class CourseraParser implements IMOOCSParser {
 			Pattern pattern = Pattern.compile("\"name\":\"(.*?)\",");
 			Matcher matcher = pattern.matcher(s);
 			matcher.find();
-			return matcher.group(1);
+			return matcher.group(1).replaceAll("'","''");
 		} else
 			return "";
 	}
@@ -44,7 +47,7 @@ public class CourseraParser implements IMOOCSParser {
 	@Override
 	public String ParseShortDescr(String s) {
 		if (s.contains("\"shortDescription\"")) {
-			Pattern pattern = Pattern.compile("\"shortDescription\":\"(.*?)\"");
+			Pattern pattern = Pattern.compile("\"shortDescription\":\"(.*?)\",\"");
 			Matcher matcher = pattern.matcher(s);
 			matcher.find();
 			return matcher.group(1).replaceAll("'","''");
@@ -55,14 +58,14 @@ public class CourseraParser implements IMOOCSParser {
 	@Override
 	public String ParseLongDescr(String s) {
 		if (s.contains("\"aboutTheCourse\"")) {
-			Pattern pattern = Pattern.compile("\"aboutTheCourse\":\"(.*?)\"");
+			Pattern pattern = Pattern.compile("\"aboutTheCourse\":\"(.*?)\",\"links\"");
 			Matcher matcher = pattern.matcher(s);
 
 			if (matcher.find()) {
 
 				// Since this is picking up HTML "Snippet" we need to clean up
 				// the string of any tags / attributes
-				return html2text(matcher.group(1)).trim().replaceAll("/\\\n", "").replaceAll("'","''");
+				return html2text(matcher.group(1).trim().replaceAll("'","''"));
 				// return matcher.group(1).replaceAll("<span>",
 				// "").replaceAll("<p>", "").replaceAll("</p>",
 				// "").replaceAll("</b>", "")
@@ -81,6 +84,7 @@ public class CourseraParser implements IMOOCSParser {
 	}
 
 	public static String html2text(String html) {
+		
 		return Jsoup.parse(html).text();
 	}
 
@@ -115,7 +119,7 @@ public class CourseraParser implements IMOOCSParser {
 			java.sql.Date sqlDate = new java.sql.Date(date.getYear(), date.getMonth(), date.getDay());
 			return sqlDate;
 		} else
-			return null;
+			return new java.sql.Date(0,0,0);
 	}
 
 	@Override
@@ -244,7 +248,7 @@ public class CourseraParser implements IMOOCSParser {
 
 	public int ParseID(String s) {
 
-		if (s.contains("\"id\""))
+		if (s.contains("\"id\":"))
 			return Integer.parseInt(s.split(",")[0].substring(5));
 		else
 			return -1;
@@ -278,7 +282,7 @@ public class CourseraParser implements IMOOCSParser {
 			Pattern pattern = Pattern.compile("\"name\":\"(.*?)\"");
 			Matcher matcher = pattern.matcher(s);
 			matcher.find();
-			return (matcher.group(1));
+			return (matcher.group(1)).replaceAll("'","''");
 		} else
 			return "";
 	}
