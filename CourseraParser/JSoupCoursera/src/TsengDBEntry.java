@@ -6,6 +6,8 @@ import org.jsoup.Jsoup;
 
 public class TsengDBEntry implements IDBEntry {
 	int id;
+	int sessionId;
+	
 	String title;
 	String short_desc;
 	String long_desc;
@@ -23,7 +25,10 @@ public class TsengDBEntry implements IDBEntry {
 	String certificate;
 	String university;
 	String time_scraped;
-
+	
+	String prof_name;
+	String prof_pic;
+	
 	
 	public TsengDBEntry() {
 		super();
@@ -42,7 +47,8 @@ public class TsengDBEntry implements IDBEntry {
 		this.language = "";
 		this.certificate = "";
 		this.university = "";
-		
+		this.prof_name = "";
+		this. prof_pic = "";
 		
 	Calendar startCal = Calendar.getInstance();
 		java.util.Date date = new Date(11);
@@ -62,6 +68,8 @@ public class TsengDBEntry implements IDBEntry {
 	{
 		CleanCategories();
 		CleanLanguages();
+		CleanDate();
+		
 		String temp ="INSERT INTO COURSE_DATA VALUES(null,'"+title+"','"+short_desc+"','"+long_desc+"','"+course_link+"','"
 				+video_link+"','"+start_date+"',"+course_length+",'"+course_image+"','"+category+"','"+site+"',"+course_fee+",'"+language+"','YES','"
 				+university+"','"+time_scraped+ "')";
@@ -172,18 +180,35 @@ public class TsengDBEntry implements IDBEntry {
 			break;
 			case "zh-cn": language = "Chinese (PRC)";
 			break;
+			case "zh-tw": language = "Mandarin (TW)";
+			break;
+			case "ru": language = "Russian";
+			break;
 		}
 	}
 		public void CleanDate()
 		{
-			if(start_date.before(java.sql.Date.valueOf("2001-01-01")))
+			if(start_date.before(java.sql.Date.valueOf("2005-01-01")))
 			{
 				start_date = java.sql.Date.valueOf("2021-01-01");
+				course_length = 0;
 			}
 			
 		}
 		
-		
+		public String PrepareQueryCourseDetails() throws UnsupportedEncodingException
+		{
+			CleanCategories();
+			CleanLanguages();
+			String temp ="INSERT INTO COURSE_DATA VALUES(null,'"+title+"','"+short_desc+"','"+long_desc+"','"+course_link+"','"
+					+video_link+"','"+start_date+"',"+course_length+",'"+course_image+"','"+category+"','"+site+"',"+course_fee+",'"+language+"','YES','"
+					+university+"','"+time_scraped+ "')";
+			
+					return new String(temp.getBytes("UTF-8"), "UTF-8");
+				//	return new String("INSERT INTO COURSE_DATA VALUES(null,'"+title+"','"+short_desc+"','"+long_desc+"','"+course_link+"','"
+				//			+video_link+"','"+start_date+"',"+course_length+",'"+course_image+"','"+category+"','"+site+"',"+course_fee+",'"+language+"','YES','"
+				//			+university+"','"+time_scraped+ "')";
+		}
 	
 	
 	

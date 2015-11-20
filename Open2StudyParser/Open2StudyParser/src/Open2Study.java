@@ -203,8 +203,9 @@ class Open2Study {
 			System.out.println("Long description   ::   " + sLongDesc);
 
 			Elements courseDates = d.select("div[class=offering_dates_start]");
-			Date startDate = new Date(1,1,1),
+			Date startDate =new Date(1, 1, 1),
 					endDate = new Date(1,1,1);
+			java.sql.Date sqlStartDate = java.sql.Date.valueOf("2021-01-01");
 			int courseLength=0;
 			if (!courseDates.isEmpty()) {
 				String sCourseStartDate = courseDates.get(0).text();
@@ -225,16 +226,36 @@ class Open2Study {
 				String [] dateTokens = sCourseStartDate.split("/");
 			
 				startDay=Integer.parseInt(dateTokens[0]);
-				startMonth=Integer.parseInt(dateTokens[1])-1;
+				startMonth=Integer.parseInt(dateTokens[1]);
 				startYear=Integer.parseInt(dateTokens[2]);
 				
+				if( Integer.parseInt(dateTokens[0])<10)
+				{
+					dateTokens[0] ="0".concat( dateTokens[0]);
+				}
+				if( Integer.parseInt(dateTokens[1])<10)
+				{
+					dateTokens[1] ="0".concat( dateTokens[1]);
+				}
+				
+				sqlStartDate = java.sql.Date.valueOf(dateTokens[2] +"-" + dateTokens[1]+ "-"+dateTokens[0]);
 				System.out.println("start year month day" + startYear+startMonth+startDay);
+				
+				
+				
+				
 				
 				int endMonth, endDay, endYear;
 				dateTokens = sCourseEndDate.split("/");
 				endDay = Integer.parseInt(dateTokens[0]);
-				endMonth = Integer.parseInt(dateTokens[1])-1;
+				endMonth = Integer.parseInt(dateTokens[1]);
 				endYear = Integer.parseInt(dateTokens[2]);
+				
+				
+				
+				
+				
+				
 				
 				
 				Calendar startCal = Calendar.getInstance();
@@ -247,7 +268,7 @@ class Open2Study {
 				//endDate = new Date(endYear,endMonth,endDay);
 				
 				courseLength = (int)( (endDate.getTime() - startDate.getTime()) 
-		                 / (1000 * 60 * 60 * 24) );
+		                 / (1000 * 60 * 60 * 24*7) );
 				
 				
 				System.out.println("COURSELENGTH******** ::: " +courseLength);
@@ -270,7 +291,7 @@ class Open2Study {
 			Elements youTubeEmbed = d.select("[class=media-youtube-player]");
 			String sYouTubeEmbed = youTubeEmbed.attr("src");
 			System.out.println("Youtube link    ::  " +  sYouTubeEmbed);
-			
+			sYouTubeEmbed="https:"+sYouTubeEmbed;
 			
 			
 			
@@ -315,15 +336,15 @@ class Open2Study {
 			System.out.println("*********COURSEDETAILS********");
 			System.out.println("*********COURSEDETAILS********");
 			
-			String sProfName = d.select("span.field-content>h3").text();
+			String sProfName = d.select("span.field-content>h3").first().text();
 			System.out.println(sProfName);
-			java.sql.Date sqlStartDate = new java.sql.Date(startDate.getYear(),startDate.getMonth(),startDate.getDay());
+			//java.sql.Date sqlStartDate = new java.sql.Date(startDate.getYear(),startDate.getMonth(),startDate.getDay());
 			System.out.println("Date is!!!! !!!      " + sqlStartDate);
 			String sProfPhoto;
 			System.out.println(d.select("div[class=views-field views-field-field-teacher-photo] > div.field-content > img[src]").attr("abs:src"));
 			String queryCourseDetails="";
 			String queryCourseData = "";
-			
+			String sTeacherPhoto =d.select("div[class=views-field views-field-field-teacher-photo] > div.field-content > img[src]").attr("abs:src");
 			java.util.Date dt = new java.util.Date();
 			
 			
@@ -346,8 +367,35 @@ class Open2Study {
 					+university+"','"+currentTime+ "')";
 			
 			statement.executeUpdate(queryCourseData);// skip writing to database; focus on data printout to a text file instead.
+			
+			
+			
+			queryCourseData = "SELECT id FROM COURSE_DATA WHERE title= '"+sCourseTitleLong+"'";
+			ResultSet queryID = statement.executeQuery(queryCourseData);
+			queryID.next();
+			System.out.println("ID IN TABLE OF THIS ENTRY IS :::: " + queryID.getInt(1));
+			int course_dataID =  queryID.getInt(1);
+			if(sProfName.length()>29)
+			{
+				String[] subName = sProfName.split(" ");
+				if(subName[0] == "Professor")
+				{
+					sProfName = "";
+					for(int i =1; i<subName.length;i++)
+						sProfName = sProfName + " " + subName[i];
+					sProfName = sProfName.trim();
+				}
+				int nameIterator =0;
+				while(sProfName.length()>29)
+				{
+					sProfName.replaceAll(subName[nameIterator], subName[nameIterator].substring(0, 1)+".");
+					
+				}
+			}
+			statement.executeUpdate("INSERT INTO COURSEDETAILS VALUES('"+course_dataID+"','"+sProfName+"','"+sTeacherPhoto+"','"+course_dataID+"')");
+			
 			statement.close(); 
-		
+			
 		}
 
 	}

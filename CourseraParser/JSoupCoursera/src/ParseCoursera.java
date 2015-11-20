@@ -1,6 +1,7 @@
 
 import java.io.IOException;
 import java.sql.DriverManager;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.HashMap;
@@ -38,12 +39,13 @@ public class ParseCoursera {
 		String coursesURL = ("https://api.coursera.org/api/catalog.v1/courses?fields=photo,shortDescription,video,instructor,previewLink,language"),
 				coursesAboutURL = ("https://api.coursera.org/api/catalog.v1/courses?fields=aboutTheCourse"),
 				sessionsURL = ("https://api.coursera.org/api/catalog.v1/sessions?fields=courseId,homeLink,durationString,startDay,startMonth,startYear,name,eligibleForCertificates"),
-				instructorsURL = ("https://api.coursera.org/api/catalog.v1/instructors?fields=photo,firstName,middleName,lastName,fullName,title"),
+				instructorsURL = ("https://api.coursera.org/api/catalog.v1/instructors?fields=photo,fullName"),
 				universitiesURL = ("https://api.coursera.org/api/catalog.v1/universities?fields=name"),
 				categoriesURL = ("https://api.coursera.org/api/catalog.v1/categories?includes=courses"),
 				sessionsCourseLINKURL = ("https://api.coursera.org/api/catalog.v1/sessions?includes=courses");
 		Class.forName("com.mysql.jdbc.Driver").newInstance();
-		java.sql.Connection connection = DriverManager.getConnection("jdbc:mysql://localhost/moocs160?characterEncoding=UTF-8", "root", "");
+		java.sql.Connection connection = DriverManager
+				.getConnection("jdbc:mysql://localhost/moocs160?characterEncoding=UTF-8", "root", "");
 
 		CourseraParser parse = new CourseraParser();
 
@@ -54,6 +56,7 @@ public class ParseCoursera {
 				categoriesJSON = (String) parse.GetURL(categoriesURL),
 				sessionsCLJSON = (String) parse.GetURL(sessionsCourseLINKURL);
 
+		instructorsJSON = parse.JSONTrim(instructorsJSON);
 		coursesJSON = parse.JSONTrim(coursesJSON);
 		coursesAboutJSON = parse.JSONTrim(coursesAboutJSON);
 
@@ -145,7 +148,7 @@ public class ParseCoursera {
 		coursesToUniJSON = parse.JSONTrim(coursesToUniJSON);
 		coursesToUniJSON = coursesToUniJSON.split(",\"linked\"")[0];
 		String[] coursesToUniObjects = coursesToUniJSON.split("\\},\\{");
-		
+
 		for (String s : coursesToUniObjects) {
 			String tempName = parse.ParseTitle(s);
 			String uniID = parse.ParseUniID(s);
@@ -156,19 +159,17 @@ public class ParseCoursera {
 			System.out.println("tempName retrieve : " + tempName);
 			System.out.println("uniID retrieve : " + uniID);
 			System.out.println("id retrieve : " + id);
-			//System.out.println("uni Name  : " +uniIdToNameMap.get(Integer.parseInt(uniID)));
-			if(uniID.contains(","))
-			{
-				for(String s2 : uniID.split(","))
-				{
-					if(tempDB.university==null||tempDB.university=="")
-						tempDB.university=uniIdToNameMap.get(Integer.parseInt(s2));
+			// System.out.println("uni Name : "
+			// +uniIdToNameMap.get(Integer.parseInt(uniID)));
+			if (uniID.contains(",")) {
+				for (String s2 : uniID.split(",")) {
+					if (tempDB.university == null || tempDB.university == "")
+						tempDB.university = uniIdToNameMap.get(Integer.parseInt(s2));
 					else
-						tempDB.university=tempDB.university+", "+uniIdToNameMap.get(Integer.parseInt(s2));
-					
+						tempDB.university = tempDB.university + ", " + uniIdToNameMap.get(Integer.parseInt(s2));
+
 				}
-			}
-			else
+			} else
 				tempDB.university = uniIdToNameMap.get(Integer.parseInt(uniID));
 			dbMap.put(id, tempDB);
 
@@ -189,7 +190,7 @@ public class ParseCoursera {
 			howManyCoursesFoundInAboutTheCourse++;
 		}
 		System.out.println("COURSES FOUND IN ABOUT THECOURSES" + howManyCoursesFoundInAboutTheCourse);
-		
+
 		categoriesJSON = categoriesJSON.split(",\"linked\"")[0];
 		String[] categoriesStringArray = categoriesJSON.split("\\},\\{");
 		for (String s : categoriesStringArray) {
@@ -226,7 +227,7 @@ public class ParseCoursera {
 		// sessions
 		// db.course_link = parse.ParseCourseLink(s);
 		// System.out.println(db.course_link);
-		courseCount =0;
+		courseCount = 0;
 		for (String s : jsonSessionObjects) {
 
 			System.out.println(s);
@@ -243,8 +244,10 @@ public class ParseCoursera {
 
 			db.course_length = parse.ParseCourseLength(s);
 			System.out.println(db.course_length);
-			if(db.start_date.before(parse.ParseStartDate(s)))
+			if (db.start_date.before(parse.ParseStartDate(s))) {
 				db.start_date = parse.ParseStartDate(s);
+				db.sessionId = sessionID;
+			}
 			System.out.println(db.start_date);
 
 			db.certificate = parse.ParseCert(s);
@@ -263,24 +266,81 @@ public class ParseCoursera {
 		System.out.println("Total # of courses ::::    " + jsonCourseObjects.length);
 		System.out.println("Total # of parsed ::::    " + courseCount);
 
+		// Instructors info
+		int instructorsFoundInCourses=0;
+		String instructorsFromCoursesJSON = (String) parse
+				.GetURL("https://api.coursera.org/api/catalog.v1/courses?includes=instructors");
+		instructorsFromCoursesJSON = parse.JSONTrim(instructorsFromCoursesJSON);
+		instructorsFromCoursesJSON = instructorsFromCoursesJSON.split(",\"linked\"")[0];
+		String[] instructorsFromCoursesObjects = instructorsFromCoursesJSON.split("\\},\\{");
+		HashMap<String, Integer> instructorCourseMap = new HashMap<String, Integer>();
+		for (String s : instructorsFromCoursesObjects) {
+			if (parse.ParseInstructorCourseIDS(s) != null&&parse.ParseInstructorCourseIDS(s) != "") {
+				String tempInstructorID = parse.ParseInstructorCourseIDS(s);
+				int tempCourseID = parse.ParseID(s);
+
+				instructorCourseMap.put(tempInstructorID, tempCourseID);
+				instructorsFoundInCourses++;
+			}
+		}
+		System.out.println("NUMBER OF INSTRUCTORS MAPPED TO COURSES     ::: " + instructorsFoundInCourses);
+		
+		
+		
+		
+		int instructorcount =0;
+		String[] instructorsObjects = instructorsJSON.split("\\},\\{");
+		for (String s : instructorsObjects) {
+			String currentInstructorID =""+ parse.ParseID(s);
+			
+			if (instructorCourseMap.containsKey(currentInstructorID)) {
+				int dbMapKey = instructorCourseMap.get(currentInstructorID);
+				TsengDBEntry tempDB =dbMap.get(dbMapKey);
+				tempDB.prof_name = parse.ParseProfName(s);
+				tempDB.prof_pic = parse.ParseProfPhoto(s);
+				if(tempDB.prof_name == "")
+					tempDB.prof_name = parse.ParseProfFirstName(s)+parse.ParseProfLastName(s);
+				
+				dbMap.put(dbMapKey, tempDB);
+				instructorcount++;
+			}
+			
+		}
+		System.out.println("NUMBER OF MATCHES TO INSTRUCTORCOURSEMAP     ::: " +instructorcount);
+		
+		
 		int uploadCount = 0;
 		for (int key : dbMap.keySet()) {
 			System.out.println(uploadCount++);
-			
+
 			System.out.println(dbMap.get(key).PrepareQuery());
 			System.out.println(dbMap.get(key).toString());
-			//Statement statement = connection.createStatement();
-			//statement.executeUpdate(dbMap.get(key).PrepareQuery());// skip
-																	// writing
-																	// to
-																	// database;
-																	// focus on
-																	// data
-																	// printout
-																	// to a text
-																	// file
-																	// instead.
-			//statement.close();
+			 Statement statement = connection.createStatement();
+			 statement.executeUpdate(dbMap.get(key).PrepareQuery());
+			 
+			 if(dbMap.get(key).prof_name.length()>1)
+			 {
+				String queryCourseData = "SELECT id FROM COURSE_DATA WHERE title= '"+dbMap.get(key).title+"'";
+				ResultSet queryID = statement.executeQuery(queryCourseData);
+				queryID.next();
+				System.out.println("ID IN TABLE OF THIS ENTRY IS :::: " + queryID.getInt(1));
+				int course_dataID =  queryID.getInt(1);
+				if(dbMap.get(key).prof_name.length()>29)
+				{
+					String[] subName = dbMap.get(key).prof_name.split(" ");
+					
+					int nameIterator =0;
+					while(dbMap.get(key).prof_name.length()>29)
+					{
+						dbMap.get(key).prof_name.replaceAll(subName[nameIterator], subName[nameIterator].substring(0, 1)+".");
+						
+					}
+				}
+				statement.executeUpdate("INSERT INTO COURSEDETAILS VALUES('"+course_dataID+"','"+dbMap.get(key).prof_name+"','"+dbMap.get(key).prof_pic+"','"+course_dataID+"')");
+			 }
+			 
+			 
+		
 		}
 
 	}

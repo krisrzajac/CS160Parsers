@@ -26,7 +26,7 @@ public class CourseraParser implements IMOOCSParser {
 	@Override
 	public String GetURL(String url) throws IOException {
 		
-		String temp = new String(Jsoup.connect(url).maxBodySize(10000000).timeout(0).ignoreContentType(true).execute().body().getBytes("UTF-8"), "UTF-8");
+		String temp = new String(Jsoup.connect(url).maxBodySize(1000000000).timeout(0).ignoreContentType(true).execute().body().getBytes("UTF-8"), "UTF-8");
 		return temp;
 	}
 
@@ -92,7 +92,7 @@ public class CourseraParser implements IMOOCSParser {
 			Pattern pattern = Pattern.compile("\"video\":\"(.*?)\"");
 			Matcher matcher = pattern.matcher(s);
 			matcher.find();
-			if (matcher.group(1) == "" || matcher.group(1) == null)
+			if (matcher.group(1).length()<5)
 				return "N/A";
 			else
 				return "https://www.youtube.com/watch?v=" + matcher.group(1);
@@ -123,7 +123,7 @@ public class CourseraParser implements IMOOCSParser {
 			java.sql.Date sqlDate = new java.sql.Date(date.getYear(), date.getMonth(), date.getDay());
 			return sqlDate;*/
 		} else
-			return java.sql.Date.valueOf("2021-01-01");
+			return java.sql.Date.valueOf("1999-01-01");
 	}
 
 	@Override
@@ -219,6 +219,26 @@ public class CourseraParser implements IMOOCSParser {
 		}
 
 	}
+	
+	public String ParseInstructorCourseIDS(String s) {
+		if (s.contains("\"id\"")) {
+			Pattern pattern = Pattern.compile("\"instructors\":\\[\\{\"id\":(.*?),");
+			Matcher matcher = pattern.matcher(s);
+
+			Pattern pat2 = Pattern.compile("\"instructors\":\\[(.*?)\\]");
+			Matcher mat2 = pat2.matcher(s);
+			if (matcher.find())
+				return matcher.group(1);
+			else if (mat2.find())
+				return mat2.group(1);
+			else
+				return "";
+		} else {
+
+			return "";
+		}
+
+	}
 
 	@Override
 	public String TimeScraped() {
@@ -284,5 +304,50 @@ public class CourseraParser implements IMOOCSParser {
 		} else
 			return "";
 	}
+	
+	public String ParseProfName(String s) {
+
+		if (s.contains("\"fullName\"")) {
+			Pattern pattern = Pattern.compile("\"fullName\":\"(.*?)\",");
+			Matcher matcher = pattern.matcher(s);
+			matcher.find();
+			return matcher.group(1).replaceAll("'", "''");
+		} else
+			return "";
+	}
+	
+	
+	public String ParseProfPhoto(String s) {
+		if (s.contains("\"photo\"")) {
+			Pattern pattern = Pattern.compile("\"photo\":\"(.*?)\"");
+			Matcher matcher = pattern.matcher(s);
+			matcher.find();
+			return matcher.group(1);
+		} else
+			return "";
+	}
+	
+	public String ParseProfFirstName(String s) {
+
+		if (s.contains("\"firstName\"")) {
+			Pattern pattern = Pattern.compile("\"firstName\":\"(.*?)\",");
+			Matcher matcher = pattern.matcher(s);
+			matcher.find();
+			return matcher.group(1).replaceAll("'", "''");
+		} else
+			return "";
+	}
+	public String ParseProfLastName(String s) {
+
+		if (s.contains("\"lastName\"")) {
+			Pattern pattern = Pattern.compile("\"lastName\":\"(.*?)\",");
+			Matcher matcher = pattern.matcher(s);
+			matcher.find();
+			return matcher.group(1).replaceAll("'", "''");
+		} else
+			return "";
+	}
+	
+	
 
 }
