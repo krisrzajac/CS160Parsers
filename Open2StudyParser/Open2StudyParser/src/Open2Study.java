@@ -289,7 +289,7 @@ class Open2Study {
 			System.out.println("Site this is available on ::   " + site);
 			
 			int courseFee = 0;
-			String language = "Eng";
+			String language = "English";
 			boolean accredation = true;
 			
 			//Elements uniElements = d.select("div[id=provider-logo");
