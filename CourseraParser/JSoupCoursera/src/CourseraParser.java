@@ -26,9 +26,7 @@ public class CourseraParser implements IMOOCSParser {
 	@Override
 	public String GetURL(String url) throws IOException {
 		
-		
-		
-		String temp = Jsoup.connect(url).maxBodySize(10000000).timeout(0).ignoreContentType(true).execute().body();
+		String temp = new String(Jsoup.connect(url).maxBodySize(10000000).timeout(0).ignoreContentType(true).execute().body().getBytes("UTF-8"), "UTF-8");
 		return temp;
 	}
 
@@ -39,7 +37,7 @@ public class CourseraParser implements IMOOCSParser {
 			Pattern pattern = Pattern.compile("\"name\":\"(.*?)\",");
 			Matcher matcher = pattern.matcher(s);
 			matcher.find();
-			return matcher.group(1).replaceAll("'","''");
+			return matcher.group(1).replaceAll("'", "''");
 		} else
 			return "";
 	}
@@ -50,7 +48,7 @@ public class CourseraParser implements IMOOCSParser {
 			Pattern pattern = Pattern.compile("\"shortDescription\":\"(.*?)\",\"");
 			Matcher matcher = pattern.matcher(s);
 			matcher.find();
-			return matcher.group(1).replaceAll("'","''");
+			return matcher.group(1).replaceAll("'", "''");
 		} else
 			return "";
 	}
@@ -65,7 +63,7 @@ public class CourseraParser implements IMOOCSParser {
 
 				// Since this is picking up HTML "Snippet" we need to clean up
 				// the string of any tags / attributes
-				return html2text(matcher.group(1).trim().replaceAll("'","''"));
+				return html2text(matcher.group(1).trim().replaceAll("'", "''"));
 				// return matcher.group(1).replaceAll("<span>",
 				// "").replaceAll("<p>", "").replaceAll("</p>",
 				// "").replaceAll("</b>", "")
@@ -84,7 +82,7 @@ public class CourseraParser implements IMOOCSParser {
 	}
 
 	public static String html2text(String html) {
-		
+
 		return Jsoup.parse(html).text();
 	}
 
@@ -94,8 +92,8 @@ public class CourseraParser implements IMOOCSParser {
 			Pattern pattern = Pattern.compile("\"video\":\"(.*?)\"");
 			Matcher matcher = pattern.matcher(s);
 			matcher.find();
-			if (matcher.group(1) == "")
-				return "";
+			if (matcher.group(1) == "" || matcher.group(1) == null)
+				return "N/A";
 			else
 				return "https://www.youtube.com/watch?v=" + matcher.group(1);
 		} else
@@ -105,21 +103,27 @@ public class CourseraParser implements IMOOCSParser {
 	@Override
 	public Date ParseStartDate(String s) {
 		if (s.contains("\"startDay\"")) {
-			Pattern pattern = Pattern
-					.compile("\"startDay\":(.*?),.*\"startMonth\":(.*?),.*\"startYear\":(.*?),");
-			
-			
+			Pattern pattern = Pattern.compile("\"startDay\":(.*?),.*\"startMonth\":(.*?),.*\"startYear\":(.*?),");
+
 			Matcher matcher = pattern.matcher(s);
 			matcher.find();
 			java.util.Date date = new Date(11);
 			Calendar startCal = Calendar.getInstance();
-			
-			startCal.set(Integer.parseInt(matcher.group(3)),Integer.parseInt(matcher.group(2)) - 1,Integer.parseInt(matcher.group(1)));
+			String year = matcher.group(3);
+			String month = matcher.group(2);
+			String day = matcher.group(1);
+			if(Integer.parseInt(month)<10)
+				month = "0".concat(month);
+			if(Integer.parseInt(day)<0)
+				day = "0".concat(day);
+			return java.sql.Date.valueOf(year+"-"+month+"-"+day);
+			/*startCal.set(Integer.parseInt(matcher.group(3)), Integer.parseInt(matcher.group(2)),
+					Integer.parseInt(matcher.group(1)));
 			date = startCal.getTime();
 			java.sql.Date sqlDate = new java.sql.Date(date.getYear(), date.getMonth(), date.getDay());
-			return sqlDate;
+			return sqlDate;*/
 		} else
-			return new java.sql.Date(0,0,0);
+			return java.sql.Date.valueOf("2021-01-01");
 	}
 
 	@Override
@@ -127,14 +131,15 @@ public class CourseraParser implements IMOOCSParser {
 		if (s.contains("\"durationString\"")) {
 			Pattern pattern = Pattern.compile("\"durationString\":\"([0-9]*?) weeks\"");
 			Matcher matcher = pattern.matcher(s);
-			if(matcher.find())
-				return 4*Integer.parseInt(matcher.group(1));
+			if (matcher.find())
+				return Integer.parseInt(matcher.group(1));
 			else
-				return -1;
+				return 0;
 		} else
-			return -1;
+			return 0;
 
 	}
+
 	@Override
 	public String ParseCourseImageURL(String s) {
 		if (s.contains("\"photo\"")) {
@@ -186,13 +191,11 @@ public class CourseraParser implements IMOOCSParser {
 			Pattern pattern = Pattern.compile("\"eligibleForCertificates\":(.*?),");
 			Matcher matcher = pattern.matcher(s);
 			matcher.find();
-			if(Boolean.parseBoolean(matcher.group(1))==true)
-					{
-						return "YES";
-					}
-			else
+			if (Boolean.parseBoolean(matcher.group(1)) == true) {
+				return "YES";
+			} else
 				return "NO";
-			
+
 		} else
 			return "NO";
 	}
@@ -201,14 +204,15 @@ public class CourseraParser implements IMOOCSParser {
 		if (s.contains("\"id\"")) {
 			Pattern pattern = Pattern.compile("\"universities\":\\[\\{\"id\":(.*?),");
 			Matcher matcher = pattern.matcher(s);
-			
+
 			Pattern pat2 = Pattern.compile("\"universities\":\\[(.*?)\\]");
 			Matcher mat2 = pat2.matcher(s);
 			if (matcher.find())
 				return matcher.group(1);
-			else if(mat2.find())
+			else if (mat2.find())
 				return mat2.group(1);
-			else return "";
+			else
+				return "";
 		} else {
 
 			return "";
@@ -218,21 +222,15 @@ public class CourseraParser implements IMOOCSParser {
 
 	@Override
 	public String TimeScraped() {
-		
+
 		java.util.Date dt = new java.util.Date();
-		
-		
-		java.text.SimpleDateFormat sdf = 
-		     new java.text.SimpleDateFormat("YYYY-MM-dd HH:mm:ss");
+
+		java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("YYYY-MM-dd HH:mm:ss");
 		System.out.println("Current time before format   :::   " + dt);
-		
-		
-		
+
 		String currentTime = sdf.format(dt);
 		System.out.println("Current time after format   :::   " + currentTime);
-		
-		
-		
+
 		return currentTime;
 	}
 
@@ -261,7 +259,7 @@ public class CourseraParser implements IMOOCSParser {
 			Pattern pattern = Pattern.compile("\"homeLink\":\"(.*?)\"");
 			Matcher matcher = pattern.matcher(s);
 			matcher.find();
-				return matcher.group(1);
+			return matcher.group(1);
 		} else
 			return "No Link Available";
 	}
@@ -282,7 +280,7 @@ public class CourseraParser implements IMOOCSParser {
 			Pattern pattern = Pattern.compile("\"name\":\"(.*?)\"");
 			Matcher matcher = pattern.matcher(s);
 			matcher.find();
-			return (matcher.group(1)).replaceAll("'","''");
+			return (matcher.group(1)).replaceAll("'", "''");
 		} else
 			return "";
 	}

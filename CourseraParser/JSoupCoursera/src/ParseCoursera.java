@@ -43,7 +43,7 @@ public class ParseCoursera {
 				categoriesURL = ("https://api.coursera.org/api/catalog.v1/categories?includes=courses"),
 				sessionsCourseLINKURL = ("https://api.coursera.org/api/catalog.v1/sessions?includes=courses");
 		Class.forName("com.mysql.jdbc.Driver").newInstance();
-		java.sql.Connection connection = DriverManager.getConnection("jdbc:mysql://localhost/moocs160", "root", "");
+		java.sql.Connection connection = DriverManager.getConnection("jdbc:mysql://localhost/moocs160?characterEncoding=UTF-8", "root", "");
 
 		CourseraParser parse = new CourseraParser();
 
@@ -243,8 +243,8 @@ public class ParseCoursera {
 
 			db.course_length = parse.ParseCourseLength(s);
 			System.out.println(db.course_length);
-
-			db.start_date = parse.ParseStartDate(s);
+			if(db.start_date.before(parse.ParseStartDate(s)))
+				db.start_date = parse.ParseStartDate(s);
 			System.out.println(db.start_date);
 
 			db.certificate = parse.ParseCert(s);
@@ -266,10 +266,11 @@ public class ParseCoursera {
 		int uploadCount = 0;
 		for (int key : dbMap.keySet()) {
 			System.out.println(uploadCount++);
-			System.out.println(dbMap.get(key).toString());
+			
 			System.out.println(dbMap.get(key).PrepareQuery());
-			Statement statement = connection.createStatement();
-			statement.executeUpdate(dbMap.get(key).PrepareQuery());// skip
+			System.out.println(dbMap.get(key).toString());
+			//Statement statement = connection.createStatement();
+			//statement.executeUpdate(dbMap.get(key).PrepareQuery());// skip
 																	// writing
 																	// to
 																	// database;
@@ -279,7 +280,7 @@ public class ParseCoursera {
 																	// to a text
 																	// file
 																	// instead.
-			statement.close();
+			//statement.close();
 		}
 
 	}

@@ -1,5 +1,8 @@
+import java.io.UnsupportedEncodingException;
 import java.sql.Date;
 import java.util.Calendar;
+
+import org.jsoup.Jsoup;
 
 public class TsengDBEntry implements IDBEntry {
 	int id;
@@ -31,7 +34,7 @@ public class TsengDBEntry implements IDBEntry {
 		this.course_link = "";
 		this.video_link = "";
 		
-		this.course_length = -1;
+		this.course_length = 0;
 		this.course_image = "";
 		this.category = "";
 		this.site = "";
@@ -41,11 +44,11 @@ public class TsengDBEntry implements IDBEntry {
 		this.university = "";
 		
 		
-		Calendar startCal = Calendar.getInstance();
+	Calendar startCal = Calendar.getInstance();
 		java.util.Date date = new Date(11);
-		startCal.set(0,0,0);
+		startCal.set(2021,1,1);
 		date = startCal.getTime();
-		this.start_date = new java.sql.Date(date.getYear(), date.getMonth(), date.getDay());
+		this.start_date =  java.sql.Date.valueOf("2000-01-01");
 		
 		
 		java.util.Date dt = new java.util.Date();
@@ -55,12 +58,18 @@ public class TsengDBEntry implements IDBEntry {
 	}
 	
 	@Override
-	public String PrepareQuery()
+	public String PrepareQuery() throws UnsupportedEncodingException
 	{
 		CleanCategories();
-		return "INSERT INTO COURSE_DATA VALUES(null,'"+title+"','"+short_desc+"','"+long_desc+"','"+course_link+"','"
+		CleanLanguages();
+		String temp ="INSERT INTO COURSE_DATA VALUES(null,'"+title+"','"+short_desc+"','"+long_desc+"','"+course_link+"','"
 				+video_link+"','"+start_date+"',"+course_length+",'"+course_image+"','"+category+"','"+site+"',"+course_fee+",'"+language+"','YES','"
 				+university+"','"+time_scraped+ "')";
+		
+				return new String(temp.getBytes("UTF-8"), "UTF-8");
+			//	return new String("INSERT INTO COURSE_DATA VALUES(null,'"+title+"','"+short_desc+"','"+long_desc+"','"+course_link+"','"
+			//			+video_link+"','"+start_date+"',"+course_length+",'"+course_image+"','"+category+"','"+site+"',"+course_fee+",'"+language+"','YES','"
+			//			+university+"','"+time_scraped+ "')";
 	}
 	 @Override public String toString() {
 		    StringBuilder result = new StringBuilder();
@@ -140,4 +149,42 @@ public class TsengDBEntry implements IDBEntry {
 		if(category.length()>99)
 			category = category.substring(0, 90)+"CONCAT**";
 	}
+	public void CleanLanguages()
+	{
+		switch(language){
+			case "en": language = "English";
+						break;
+			case "ar": language = "Arabic";
+			break;
+			case "de": language = "German";
+			break;
+			case "es": language = "Spanish";
+			break;
+			case "fr": language = "French";
+			break;
+			case "he": language = "Hebrew";
+			break;
+			case "it": language = "Italian";
+			break;
+			case "pt-br": language = "Portuguese";
+			break;
+			case "tr": language = "Turkish";
+			break;
+			case "zh-cn": language = "Chinese (PRC)";
+			break;
+		}
+	}
+		public void CleanDate()
+		{
+			if(start_date.before(java.sql.Date.valueOf("2001-01-01")))
+			{
+				start_date = java.sql.Date.valueOf("2021-01-01");
+			}
+			
+		}
+		
+		
+	
+	
+	
 }
