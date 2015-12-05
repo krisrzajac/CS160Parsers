@@ -1,0 +1,10 @@
+[24-Nov-2015 09:37:25] PHP Parse error:  syntax error, unexpected T_ECHO in /home2/youthcyb/public_html/sjsucs/cs160/sec1group3/index.php on line 30
+[24-Nov-2015 09:37:31] PHP Parse error:  syntax error, unexpected T_ECHO in /home2/youthcyb/public_html/sjsucs/cs160/sec1group3/index.php on line 30
+[24-Nov-2015 09:38:02] PHP Parse error:  syntax error, unexpected T_ECHO in /home2/youthcyb/public_html/sjsucs/cs160/sec1group3/index.php on line 30
+[24-Nov-2015 09:39:55] PHP Parse error:  syntax error, unexpected T_PRINT in /home2/youthcyb/public_html/sjsucs/cs160/sec1group3/index.php on line 30
+[24-Nov-2015 09:39:57] PHP Parse error:  syntax error, unexpected T_PRINT in /home2/youthcyb/public_html/sjsucs/cs160/sec1group3/index.php on line 30
+[03-Dec-2015 09:17:58] PHP Parse error:  syntax error, unexpected T_LNUMBER, expecting ',' or ';' in /home2/youthcyb/public_html/sjsucs/cs160/sec1group3/browse.php on line 192
+[03-Dec-2015 09:18:02] PHP Parse error:  syntax error, unexpected T_LNUMBER, expecting ',' or ';' in /home2/youthcyb/public_html/sjsucs/cs160/sec1group3/browse.php on line 192
+[03-Dec-2015 09:19:05] PHP Parse error:  syntax error, unexpected T_LNUMBER, expecting ',' or ';' in /home2/youthcyb/public_html/sjsucs/cs160/sec1group3/browse.php on line 192
+[03-Dec-2015 09:19:07] PHP Parse error:  syntax error, unexpected T_LNUMBER, expecting ',' or ';' in /home2/youthcyb/public_html/sjsucs/cs160/sec1group3/browse.php on line 192
+[03-Dec-2015 09:19:12] PHP Parse error:  syntax error, unexpected T_LNUMBER, expecting ',' or ';' in /home2/youthcyb/public_html/sjsucs/cs160/sec1group3/browse.php on line 192
