@@ -102,6 +102,9 @@ public class ParseCoursera {
 			String language = parse.ParseLanguage(s);
 			System.out.println("language used iss ::::::::::::::      " + language);
 			db.language = language;
+
+			db.course_link = "https://www.coursera.org/course/" + parse.ParseShortName(s);
+
 			// String category =
 			// parse.ParseLongDescr((String)parse.GetURL("https://api.coursera.org/api/catalog.v1/courses/"+db.id+"?include=categories"));
 
@@ -134,7 +137,7 @@ public class ParseCoursera {
 			 * db.university = uni; } catch(Exception e) { uni = ""; }
 			 * 
 			 */
-
+			db.site = parse.SetSite("Coursera");
 			dbMap.put(db.id, db);
 
 			courseCount++;
@@ -239,7 +242,6 @@ public class ParseCoursera {
 
 			TsengDBEntry db = dbMap.get(courseID);
 
-			db.course_link = parse.ParseCourseLink(s);
 			System.out.println(db.course_link);
 
 			db.course_length = parse.ParseCourseLength(s);
@@ -247,7 +249,9 @@ public class ParseCoursera {
 			if (db.start_date.before(parse.ParseStartDate(s))) {
 				db.start_date = parse.ParseStartDate(s);
 				db.sessionId = sessionID;
+
 			}
+
 			System.out.println(db.start_date);
 
 			db.certificate = parse.ParseCert(s);
@@ -267,80 +271,157 @@ public class ParseCoursera {
 		System.out.println("Total # of parsed ::::    " + courseCount);
 
 		// Instructors info
-		int instructorsFoundInCourses=0;
+		int instructorsFoundInCourses = 0;
 		String instructorsFromCoursesJSON = (String) parse
 				.GetURL("https://api.coursera.org/api/catalog.v1/courses?includes=instructors");
 		instructorsFromCoursesJSON = parse.JSONTrim(instructorsFromCoursesJSON);
 		instructorsFromCoursesJSON = instructorsFromCoursesJSON.split(",\"linked\"")[0];
 		String[] instructorsFromCoursesObjects = instructorsFromCoursesJSON.split("\\},\\{");
-		HashMap<String, Integer> instructorCourseMap = new HashMap<String, Integer>();
-		for (String s : instructorsFromCoursesObjects) {
-			if (parse.ParseInstructorCourseIDS(s) != null&&parse.ParseInstructorCourseIDS(s) != "") {
-				String tempInstructorID = parse.ParseInstructorCourseIDS(s);
-				int tempCourseID = parse.ParseID(s);
+		HashMap<Integer, String> instructorCourseMap = new HashMap<Integer, String>();
 
-				instructorCourseMap.put(tempInstructorID, tempCourseID);
-				instructorsFoundInCourses++;
-			}
+		for (String s : instructorsFromCoursesObjects) {
+			String instructorId = parse.ParseInstructorCourseIDS(s);
+			int coursId = parse.ParseID(s);
+			instructorCourseMap.put(coursId, instructorId);
 		}
+
 		System.out.println("NUMBER OF INSTRUCTORS MAPPED TO COURSES     ::: " + instructorsFoundInCourses);
-		
-		
-		
-		
-		int instructorcount =0;
+
+		int instructorcount = 0;
+
 		String[] instructorsObjects = instructorsJSON.split("\\},\\{");
+		HashMap<Integer, Instructors> instructorsMap = new HashMap<Integer, Instructors>();
 		for (String s : instructorsObjects) {
-			String currentInstructorID =""+ parse.ParseID(s);
-			
-			if (instructorCourseMap.containsKey(currentInstructorID)) {
-				int dbMapKey = instructorCourseMap.get(currentInstructorID);
-				TsengDBEntry tempDB =dbMap.get(dbMapKey);
-				tempDB.prof_name = parse.ParseProfName(s);
-				tempDB.prof_pic = parse.ParseProfPhoto(s);
-				if(tempDB.prof_name == "")
-					tempDB.prof_name = parse.ParseProfFirstName(s)+parse.ParseProfLastName(s);
-				
-				dbMap.put(dbMapKey, tempDB);
-				instructorcount++;
-			}
-			
+			String currentInstructorID = "" + parse.ParseID(s);
+			Instructors temp = new Instructors();
+			temp.firstName = parse.ParseProfFirstName(s);
+			temp.lastName = parse.ParseProfLastName(s);
+			temp.fullName = parse.ParseProfName(s);
+			temp.photoURL = parse.ParseProfPhoto(s);
+
 		}
-		System.out.println("NUMBER OF MATCHES TO INSTRUCTORCOURSEMAP     ::: " +instructorcount);
-		
-		
-		int uploadCount = 0;
+		System.out.println("NUMBER OF MATCHES TO INSTRUCTORCOURSEMAP     ::: " + instructorcount);
+
+		int uploadCount = 3;
+		int instructorCount=1;
 		for (int key : dbMap.keySet()) {
-			System.out.println(uploadCount++);
+			System.out.println(uploadCount);
 
 			System.out.println(dbMap.get(key).PrepareQuery());
 			System.out.println(dbMap.get(key).toString());
-			 Statement statement = connection.createStatement();
-			 statement.executeUpdate(dbMap.get(key).PrepareQuery());
-			 
-			 if(dbMap.get(key).prof_name.length()>1)
-			 {
-				String queryCourseData = "SELECT id FROM COURSE_DATA WHERE title= '"+dbMap.get(key).title+"'";
+			Statement statement = connection.createStatement();
+			statement.executeUpdate(dbMap.get(key).PrepareQuery());
+
+			String tempLink = dbMap.get(key).course_link;
+			Document tempD;
+			try {
+				tempD = Jsoup.connect(dbMap.get(key).course_link).timeout(0).get();
+			} catch (java.net.ConnectException e) {
+				System.out.println("attempting reconnect to :" + dbMap.get(key).course_link);
+				tempD = Jsoup.connect(dbMap.get(key).course_link).timeout(0).get();
+			}
+			String instructorName = "";
+			if (tempD.select("[class=c-cs-instructor-name]").first() != null) {
+				instructorName = tempD.select("[class=c-cs-instructor-name]").first().text().replaceAll("'", "''");
+				
+			} else {
+
+				if (instructorCourseMap.containsKey(key)) {
+					String instID = instructorCourseMap.get(key);
+					if (instructorsMap.containsKey(instID)) {
+						if (instructorsMap.get(instID).fullName != "") {
+							instructorName = instructorsMap.get(instID).fullName.replaceAll("'", "''");
+							;
+						} else if (instructorsMap.get(instID).firstName != "") {
+							instructorName = instructorsMap.get(instID).firstName + " "
+									+ instructorsMap.get(instID).lastName;
+							instructorName = instructorName.replaceAll("'", "''");
+						} else {
+							instructorName = "N/A";
+						}
+					}
+				} else {
+					instructorName = "N/A";
+				}
+
+				/*
+				 * if (tempD.select("[property=og:url]").first() != null) {
+				 * Document tempD2 =
+				 * Jsoup.connect(tempD.select("[property=og:url]").first().attr(
+				 * "content")) .timeout(0).get(); if
+				 * (tempD.select("[class*=instructor-name]").first() != null) {
+				 * String instructorName =
+				 * tempD.select("[class=c-cs-instructor-name]").first().text();
+				 * } else { String s = parse.GetURL(url); }
+				 * 
+				 * }
+				 */
+			}
+			String instructorPic = "";
+			if (tempD.select("[class=c-cs-instructor-img]").first() != null) {
+				instructorPic = tempD.select("[class=c-cs-instructor-img]").first().attr("src").split("\\?")[0]
+						.replaceAll("'", "''");
+			} else {
+
+				if (instructorCourseMap.containsKey(key)) {
+					String instID = instructorCourseMap.get(key);
+					if (instructorsMap.containsKey(instID)) {
+						if (instructorsMap.get(instID).photoURL != "") {
+							instructorPic = instructorsMap.get(instID).photoURL.replaceAll("'", "''");
+
+						} else {
+							instructorPic = "N/A";
+						}
+					}
+				} else {
+					instructorPic = "N/A";
+				}
+
+				/*
+				 * TsengDBEntry tempDb2 = dbMap.get(key); if
+				 * (tempD.select("[property=og:url]").first() != null) { String
+				 * s =
+				 * tempD.select("[property=og:url]").first().attr("content");
+				 * Document tempD2 =
+				 * Jsoup.connect(tempD.select("[property=og:url]").first().attr(
+				 * "content")) .timeout(0).get(); if
+				 * (tempD.select("[class*=instructor-name]").first() != null) {
+				 * String instructorPic =
+				 * tempD.select("[class*=instructor-photo]").first().attr("src")
+				 * .split("\\?")[0]; }
+				 * 
+				 * }
+				 */
+			}
+
+			if (instructorName.length() > 4) {
+				String queryCourseData = "SELECT id FROM COURSE_DATA WHERE short_desc= '" + dbMap.get(key).short_desc
+						+ "'";
 				ResultSet queryID = statement.executeQuery(queryCourseData);
 				queryID.next();
+
 				System.out.println("ID IN TABLE OF THIS ENTRY IS :::: " + queryID.getInt(1));
-				int course_dataID =  queryID.getInt(1);
-				if(dbMap.get(key).prof_name.length()>29)
-				{
-					String[] subName = dbMap.get(key).prof_name.split(" ");
-					
-					int nameIterator =0;
-					while(dbMap.get(key).prof_name.length()>29)
-					{
-						dbMap.get(key).prof_name.replaceAll(subName[nameIterator], subName[nameIterator].substring(0, 1)+".");
-						
+
+				int course_dataID = queryID.getInt(1);
+				if (instructorName.length() > 29) {
+
+					String[] subName = instructorName.split(" ");
+					instructorName = instructorName.split(",")[0];
+					int nameIterator = 0;
+					while (instructorName.length() > 29) {
+						System.out.println("hhehehehe" + instructorName);
+						instructorName = instructorName.replaceAll(subName[nameIterator],
+								subName[nameIterator].substring(0, 1) + ".");
+						nameIterator++;
+
 					}
 				}
-				statement.executeUpdate("INSERT INTO COURSEDETAILS VALUES('"+course_dataID+"','"+dbMap.get(key).prof_name+"','"+dbMap.get(key).prof_pic+"','"+course_dataID+"')");
-			 }
-			 
-			 
-		
+
+				statement.executeUpdate("INSERT INTO COURSEDETAILS VALUES('" + instructorCount + "','" + instructorName
+						+ "','" + instructorPic + "','" + uploadCount + "')");
+				instructorCount++;
+			}
+			uploadCount++;
 		}
 
 	}

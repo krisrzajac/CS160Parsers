@@ -164,6 +164,7 @@ public class CourseraParser implements IMOOCSParser {
 
 	@Override
 	public String SetSite(String s) {
+		
 		return s;
 
 	}
@@ -347,7 +348,19 @@ public class CourseraParser implements IMOOCSParser {
 		} else
 			return "";
 	}
+	public String ParseShortName(String s)
+	{
+		if(s.contains("\"shortName\":"))
+		{
+			Pattern pattern = Pattern.compile("\"shortName\":\"(.*?)\",");
+			Matcher matcher = pattern.matcher(s);
+			matcher.find();
+			return matcher.group(1).replaceAll("'", "''");
+		} else
+			return "";
+		
+		
+	}
 	
 	
-
 }

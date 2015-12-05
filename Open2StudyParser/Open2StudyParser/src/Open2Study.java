@@ -370,7 +370,7 @@ class Open2Study {
 			
 			
 			
-			queryCourseData = "SELECT id FROM COURSE_DATA WHERE title= '"+sCourseTitleLong+"'";
+			queryCourseData = "SELECT id FROM COURSE_DATA WHERE short_desc= '"+sShortCourseDescription+"'";
 			ResultSet queryID = statement.executeQuery(queryCourseData);
 			queryID.next();
 			System.out.println("ID IN TABLE OF THIS ENTRY IS :::: " + queryID.getInt(1));
