@@ -132,24 +132,24 @@ $random_courses = returnSixRandomCourses();
 			  <div id="slider"> 
 			    <div id="owl-demo" class="owl-carousel owl-theme">
 				<?php
-					// To extend video slider
-					$videos_to_show = 51;
+					// Display videos from db in slider. Populate the slide with X# of videos
+					$video_to_show = 51;
 					$start =rand(0,count($random_videos['results']));
 					
-					if($start >$videos_to_show)
+					if($start > $video_to_show)
 					{
-						$start = $start -($videos_to_show);
+						$start = $start -($video_to_show);
 					}
 					else{
 						$start =0;
 					}
-					for($x = $start;$x<=$start+$videos_to_show;$x++)
+					for($x = $start;$x<=$start+$video_to_show;$x++)
 					{	
 						 
 						 echo'<div class="owlitem"><iframe width="700" height="394" src="'.$random_videos['results'][$x]->video_link.'" frameborder="0" allowfullscreen></iframe></div>';
 			       
 					}
-					
+					i
 			        ?>
 
 			     </div>
@@ -269,37 +269,37 @@ $random_courses = returnSixRandomCourses();
       </div>
         
           <div id="form_container">
-            <form id="contact-form-new"  method="get" action="browse.php">
+            <form id="contact-form-new"  method="post" action="">
               <article>
               <ul >
                 <li id="li_3" >
                   <label class="description" for="element_3">Course Duration </label>
                   <span>
-                  <input id="4Weeks" name="4Weeks" class="element checkbox" type="checkbox" value="1" />
-                  <label class="choice" for="4Weeks">4 Weeks</label>
-                  <input id="7Weeks" name="7Weeks" class="element checkbox" type="checkbox" value="1" />
-                  <label class="choice" for="7Weeks">7 Weeks</label>
-                  <input id="8Weeks" name="8Weeks" class="element checkbox" type="checkbox" value="1" />
-                  <label class="choice" for="8Weeks">8 Weeks</label>
-                  <input id="10Weeks" name="10Weeks" class="element checkbox" type="checkbox" value="1" />
-                  <label class="choice" for="10Weeks">10 Weeks</label>
-                  <input id="0Weeks" name="0Weeks" class="element checkbox" type="checkbox" value="1" />
-                  <label class="choice" for="0Weeks">Unlimited</label>
+                  <input id="element_3_1" name="element_3_1" class="element checkbox" type="checkbox" value="1" />
+                  <label class="choice" for="element_3_1">4 Weeks</label>
+                  <input id="element_3_2" name="element_3_2" class="element checkbox" type="checkbox" value="1" />
+                  <label class="choice" for="element_3_2">7 Weeks</label>
+                  <input id="element_3_3" name="element_3_3" class="element checkbox" type="checkbox" value="1" />
+                  <label class="choice" for="element_3_3">8 Weeks</label>
+                  <input id="element_3_4" name="element_3_4" class="element checkbox" type="checkbox" value="1" />
+                  <label class="choice" for="element_3_4">10 Weeks</label>
+                  <input id="element_3_5" name="element_3_5" class="element checkbox" type="checkbox" value="1" />
+                  <label class="choice" for="element_3_5">Unlimited</label>
                   </span> </li>
                 <li id="li_1" >
                   <label class="description" for="element_1">Start Date </label>
                   <span>
-                  <input id="Year" name="Year" class="element text" size="6" maxlength="4" value="" type="text">
+                  <input id="element_1_3" name="element_1_3" class="element text" size="6" maxlength="4" value="" type="text">
                   —
-                  <label for="Year" id="contact-form-new-small">YYYY</label>
+                  <label for="element_1_3" id="contact-form-new-small">YYYY</label>
                   </span><span>
-                  <input id="Month" name="Month" class="element text" size="4" maxlength="2" value="" type="text">
+                  <input id="element_1_1" name="element_1_1" class="element text" size="4" maxlength="2" value="" type="text">
                   —
-                  <label for="Month" id="contact-form-new-small">MM</label>
+                  <label for="element_1_1" id="contact-form-new-small">MM</label>
                   </span> <span>
-                  <input id="Day" name="Day" class="element text" size="4" maxlength="2" value="" type="text">
+                  <input id="element_1_2" name="element_1_2" class="element text" size="4" maxlength="2" value="" type="text">
                   
-                  <label for="Day" id="contact-form-new-small">DD</label>
+                  <label for="element_1_2" id="contact-form-new-small">DD</label>
                   </span><span id="calendar_1"> <img id="cal_img_1" class="datepicker" src="img/calendar.gif" alt="Pick a date."> </span> 
                   <script type="text/javascript">
       Calendar.setup({
@@ -313,21 +313,21 @@ $random_courses = returnSixRandomCourses();
     </script> 
                 </li>
                 <li id="li_2" >
-                  <label class="description" for="courseFee">Course Fee </label>
+                  <label class="description" for="element_2">Course Fee </label>
                   <span class="symbol">$</span> <span>
-                  <input id="courseFee" name="cost" class="element text currency" size="10" value="" type="text" />
+                  <input id="element_2_1" name="element_2_1" class="element text currency" size="10" value="" type="text" />
                   
-                  <label for="courseFee" id="contact-form-new-small">Dollars</label>
+                  <label for="element_2_1" id="contact-form-new-small">Dollars</label>
                   </span>  </li>
                 <li id="li_4" >
                   <label class="description" for="element_4">Languages </label>
                   <span>
-                  <input id="English" name="English" class="element checkbox" type="checkbox" value="1" />
-                  <label class="choice" for="English">English</label>
-                  <input id="Spanish" name="Spanish" class="element checkbox" type="checkbox" value="1" />
-                  <label class="choice" for="Spanish">Español</label>
-                  <input id="French" name="French" class="element checkbox" type="checkbox" value="1" />
-                  <label class="choice" for="French">French</label>
+                  <input id="element_4_1" name="element_4_1" class="element checkbox" type="checkbox" value="1" />
+                  <label class="choice" for="element_4_1">English</label>
+                  <input id="element_4_2" name="element_4_2" class="element checkbox" type="checkbox" value="1" />
+                  <label class="choice" for="element_4_2">Español</label>
+                  <input id="element_4_3" name="element_4_3" class="element checkbox" type="checkbox" value="1" />
+                  <label class="choice" for="element_4_3">French</label>
                   </span> </li>
                 <li class="buttons">
                   <input type="hidden" name="form_id" value="1079384" />
