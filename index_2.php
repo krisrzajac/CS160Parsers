@@ -132,7 +132,8 @@ $random_courses = returnSixRandomCourses();
 			  <div id="slider"> 
 			    <div id="owl-demo" class="owl-carousel owl-theme">
 				<?php
-					$video_to_show = 100;
+					// Display videos from db in slider. Populate the slide with X# of videos
+					$video_to_show = 51;
 					$start =rand(0,count($random_videos['results']));
 					
 					if($start > $video_to_show)
