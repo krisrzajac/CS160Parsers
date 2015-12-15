@@ -129,17 +129,18 @@ $random_courses = returnSixRandomCourses();
 			  <div id="slider"> 
 			    <div id="owl-demo" class="owl-carousel owl-theme">
 				<?php
-					
+					// To extend video slider
+					$videos_to_show = 51;
 					$start =rand(0,count($random_videos['results']));
 					
-					if($start >5)
+					if($start >$videos_to_show)
 					{
-						$start = $start -5;
+						$start = $start -($videos_to_show);
 					}
 					else{
 						$start =0;
 					}
-					for($x = $start;$x<=$start+5;$x++)
+					for($x = $start;$x<=$start+$videos_to_show;$x++)
 					{	
 						 
 						 echo'<div class="owlitem"><iframe width="700" height="394" src="'.$random_videos['results'][$x]->video_link.'" frameborder="0" allowfullscreen></iframe></div>';
