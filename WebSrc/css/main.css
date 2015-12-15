@@ -236,6 +236,9 @@ body .text-color2
 	height:300px;
 	float:left;
 	position: relative;
+	background-size: cover;                      
+    background-repeat: no-repeat;
+    background-position: center center;
 }
 
 .item.w2 
@@ -261,6 +264,10 @@ body .text-color2
 .pushfooter
 {
 	margin-top: -2px;
+}
+
+.lefttext{
+	text-align: left;
 }
 
 .portfolio #portfolio-introduction
@@ -369,6 +376,11 @@ body .text-color2
 	/*padding-top: 200px;*/
 }
 
+article {
+  -webkit-columns: 3 200px;
+     -moz-columns: 3 200px;
+          columns: 3 200px;
+}
 
 
 
@@ -387,7 +399,7 @@ body .text-color2
 	margin-bottom: 50px
 }
 
-#contact #contact-form input[type=submit]
+#contact #contact-form-new input[type=submit]
 {
 	background-color:#C54D8D;
 	border:1px solid #882565																																																																																																																																																																						
@@ -398,11 +410,17 @@ body .text-color2
 	text-align: left;
 }
 
-#contact #contact-form label
+#contact #contact-form-new label
 {
-	font-size: 16px;
-	font-weight: lighter;
+	font-size: 20px;
+	font-weight: 300;
 }
+
+#contact #contact-form-new-small label
+{
+font-size: 20px;
+    font-weight: 300;
+    }
 
 #contact .contact-description p
 {

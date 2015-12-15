@@ -26,6 +26,7 @@ $random_courses = returnSixRandomCourses();
 	<link rel="stylesheet" type="text/css" media="all" href="owl/owl.carousel.css">
 	<link rel="stylesheet" type="text/css" media="all" href="owl/owl.theme.css">
 	<link rel="stylesheet" type="text/css" media="all" href="owl/owl.transitions.css">
+	<link rel="stylesheet" type="text/css" href="calendar/view.css" media="all">
 
 
 	<script type="text/javascript" src="js/jquery.js"></script>
@@ -33,8 +34,9 @@ $random_courses = returnSixRandomCourses();
 	<script type="text/javascript" src="js/singlepagenav.js"></script>
 	<script type="text/javascript" src="js/queryloader.js"></script>	
 	<script type="text/javascript" src="js/main.js"></script>
-
 	<script src="owl/owl.carousel.min.js"></script>
+	<script type="text/javascript" src="calendar/view.js"></script>
+	<script type="text/javascript" src="calendar/calendar.js"></script>
 
 	<meta charset="UTF-8">
 	<meta name="description" content="CouseCrazy! - Take courses online!">
@@ -81,13 +83,14 @@ $random_courses = returnSixRandomCourses();
 				</div>
 				<div class="row">
 					<p>
-						An online school which will enchance your knowledge.
+						An online school which will enhance your knowledge.
 					</p>
 					</div>
 					<br>
 				<div class="row">
-				      <form action ="browse.php">
-				  <p> <input class="form-control-search" type="search"> <input class="btn-search btn-success" type="submit" name="s" id="s" value="LEARN">
+				      <form action ="browse.php" method = "get">
+				  <p> <input class="form-control-search" type="search" name = "s"> 
+				  <input class="btn-search btn-success" type="submit" value="LEARN">
 					
 				  </p>
 				  </form>
@@ -205,12 +208,12 @@ $random_courses = returnSixRandomCourses();
 												<p>Class is hosted by '.$row->site.'</p>
 	                                            <p><b>Course Duration:    </b>'.$row->course_length.' weeks</p>
 												<p><b>Start Date:    </b>'.$row->start_date.' weeks</p>
-	                                            <p>Course Fee:  '.$row->course_fee.' <br /> </p>
-												<p>Languages offered: '.$row->language.' <br /> </p>
-												<p>Certification: '.$row->certificate.' <br /> </p>
+	                                            <p><b>Course Fee:</b>  '.$row->course_fee.' <br /> </p>
+												<p><b>Languages offered:</b> '.$row->language.' <br /> </p>
+												<p><b>Certification:</b> '.$row->certificate.' <br /> </p>
 												<p><br /><br />'.$row->short_desc.' <br /> </p>
 												<p>'.$row->video_link.' <br /> </p>
-												<p style ="font-size:30px"><a href="'.$row->course_link.'">Check the course out today <br /></a> </p>
+												<p style ="font-size:30px"><a href="'.$row->course_link.'" target="_blank">Check the course out today <br /></a> </p>
 												
 												
 												
@@ -254,53 +257,89 @@ $random_courses = returnSixRandomCourses();
 		</div>
 
 		<div class="section section5 footer pushfooter" id="contact">
-			<div class="container">
-				<div class="row">
-					<h3 id="contact-us-header">Recommendations</h3>
-				</div>
-                <div class="row">
-                    <div class="col-md-5 contact-description">
-                        <p>We are bunch of open minded people. So, we are really keen to know what you want to learn next.</p> 
-                        <p>Furthermore, if you would like suggestions to what you can learn about next, fill out the following form and we would be happy to give you usefull recommendations. Our systems will search course that would be a good fit to your ability and fit your duration desires.</p>	
-                        <p><strong>Art<br>Science<br>History<br>Technology<br>Math<br>
-                                </strong></p>
-                        
-                    </div>
-                    <div class="col-md-offset-1 col-md-6">
-                        <div id="mainErrorDisplay">
-
-                        </div>
-                        <form id="contact-form">
-                            <div class="form-group">
-                                <label for="name">Subject *</label>
-                                <input type="text" class="form-control" id="name">
-                            </div>
-
-                            <div class="form-group">
-                                <label for="email">Duration *</label>
-                                <input type="text" class="form-control" id="email">
-                            </div>
-
-                            <div class="form-group">
-                                <label for="phone">Learning Level *<small>Eg : High School / University</small></label>
-                                <input type="text" class="form-control" id="phone">
-                            </div>
-
-                            <div class="form-group">
-                                <label for="message">Tags</label>
-                                <textarea class="form-control" id="message"></textarea>
-                            </div>
-
-                            <div class="form-group">
-                                <input type="submit" value="Search" id="send" class="btn btn-success">
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-
-		</div>
-	</div>
-	<script type="text/javascript" src="owl/script.js"></script>
+  <div class="container">
+    <div class="row">
+      <h3 id="contact-us-header">Recommendations</h3>
+    </div>
+    <div class="row">
+      <div class="contact-description">
+        <p>We are bunch of open minded people. So, we are really keen to know what you want to learn next.</p>
+        <p>Furthermore, if you would like suggestions to what you can learn about next, fill out the following form and we would be happy to give you usefull recommendations. Our systems will search course that would be a good fit to your ability and fit your duration desires.</p>
+      </div>
+        
+          <div id="form_container">
+            <form id="contact-form-new"  method="get" action="browse.php">
+              <article>
+              <ul >
+                <li id="li_3" >
+                  <label class="description" for="element_3">Course Duration </label>
+                  <span>
+                  <input id="4Weeks" name="4Weeks" class="element checkbox" type="checkbox" value="1" />
+                  <label class="choice" for="4Weeks">4 Weeks</label>
+                  <input id="7Weeks" name="7Weeks" class="element checkbox" type="checkbox" value="1" />
+                  <label class="choice" for="7Weeks">7 Weeks</label>
+                  <input id="8Weeks" name="8Weeks" class="element checkbox" type="checkbox" value="1" />
+                  <label class="choice" for="8Weeks">8 Weeks</label>
+                  <input id="10Weeks" name="10Weeks" class="element checkbox" type="checkbox" value="1" />
+                  <label class="choice" for="10Weeks">10 Weeks</label>
+                  <input id="0Weeks" name="0Weeks" class="element checkbox" type="checkbox" value="1" />
+                  <label class="choice" for="0Weeks">Unlimited</label>
+                  </span> </li>
+                <li id="li_1" >
+                  <label class="description" for="element_1">Start Date </label>
+                  <span>
+                  <input id="Year" name="Year" class="element text" size="6" maxlength="4" value="" type="text">
+                  —
+                  <label for="Year" id="contact-form-new-small">YYYY</label>
+                  </span><span>
+                  <input id="Month" name="Month" class="element text" size="4" maxlength="2" value="" type="text">
+                  —
+                  <label for="Month" id="contact-form-new-small">MM</label>
+                  </span> <span>
+                  <input id="Day" name="Day" class="element text" size="4" maxlength="2" value="" type="text">
+                  
+                  <label for="Day" id="contact-form-new-small">DD</label>
+                  </span><span id="calendar_1"> <img id="cal_img_1" class="datepicker" src="img/calendar.gif" alt="Pick a date."> </span> 
+                  <script type="text/javascript">
+      Calendar.setup({
+      inputField   : "element_1_3",
+      baseField    : "element_1",
+      displayArea  : "calendar_1",
+      button     : "cal_img_1",
+      ifFormat   : "%B %e, %Y",
+      onSelect   : selectDate
+      });
+    </script> 
+                </li>
+                <li id="li_2" >
+                  <label class="description" for="courseFee">Course Fee </label>
+                  <span class="symbol">$</span> <span>
+                  <input id="courseFee" name="cost" class="element text currency" size="10" value="" type="text" />
+                  
+                  <label for="courseFee" id="contact-form-new-small">Dollars</label>
+                  </span>  </li>
+                <li id="li_4" >
+                  <label class="description" for="element_4">Languages </label>
+                  <span>
+                  <input id="English" name="English" class="element checkbox" type="checkbox" value="1" />
+                  <label class="choice" for="English">English</label>
+                  <input id="Spanish" name="Spanish" class="element checkbox" type="checkbox" value="1" />
+                  <label class="choice" for="Spanish">Español</label>
+                  <input id="French" name="French" class="element checkbox" type="checkbox" value="1" />
+                  <label class="choice" for="French">French</label>
+                  </span> </li>
+                <li class="buttons">
+                  <input type="hidden" name="form_id" value="1079384" />
+                  <input id="saveForm" class="button_text" type="submit" name="submit" value="Submit" />
+                </li>
+              </ul>
+            </article>
+            </form>      
+        
+      </div>
+    </div>
+  </div>
+</div>
+<script type="text/javascript" src="owl/script.js"></script>
 </body>
 </html>
