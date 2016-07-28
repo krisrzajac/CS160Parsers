@@ -1,8 +1,7 @@
 
 
-<snippet>
-  <content><![CDATA[
-# ${1:CourseCrazy}
+
+## CourseCrazy
 
 This is the code for my final class project, a website that aggragates data about Massve Open Online Courses (MOOCS).
 In this repository there is the code for the web scrapers we used to populate our database, as well as ancillary programs used to format data to our specifications.
@@ -11,10 +10,6 @@ In this repository there is the code for the web scrapers we used to populate ou
 ## Installation
 
 JSoup 1.8.3 is necessary to run the parsers.
-
-## Usage
-
-TODO: Write usage instructions
 
 ## Contributing
 
